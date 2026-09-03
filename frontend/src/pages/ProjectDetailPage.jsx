@@ -64,7 +64,7 @@ export default function ProjectDetailPage() {
       actions={
         <motion.button
           data-testid="run-whatif-btn"
-          onClick={() => navigate("/simulator")}
+          onClick={() => navigate(`/simulator?project=${p.id}`)}
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
           className="flex items-center gap-2 rounded-xl bg-[#0B3D91] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-[#0B3D91]/25 transition-colors hover:bg-[#09337A]"

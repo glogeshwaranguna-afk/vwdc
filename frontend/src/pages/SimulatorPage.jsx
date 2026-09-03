@@ -1,26 +1,51 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Loader2, TrendingDown, Clock } from "lucide-react";
+import { Play, Loader2, TrendingDown, Clock, Crosshair } from "lucide-react";
 import { DashboardShell, Card } from "@/components/dashboard/DashboardShell";
-import { SIMULATOR_CONFIG } from "@/lib/appData";
+import { SIMULATOR_CONFIG, projectById } from "@/lib/appData";
+
+const FACTOR_DEFAULTS = {
+  compensation: { pending: "Pending", partial: "Partial", completed: "Completed" },
+  approval: { pending: "Pending", "in-progress": "In Progress", approved: "Approved" },
+  legal: { dispute: "Yes", clear: "No" },
+};
+
+const initialFor = (proj) => ({
+  compensation: FACTOR_DEFAULTS.compensation[proj.compensation],
+  approval: FACTOR_DEFAULTS.approval[proj.approval],
+  legal: FACTOR_DEFAULTS.legal[proj.legal],
+  documentation: proj.riskScore >= 70 ? "Incomplete" : "Partial",
+  stakeholder: "Slow",
+});
 
 export default function SimulatorPage() {
-  const [values, setValues] = useState(() =>
-    Object.fromEntries(SIMULATOR_CONFIG.factors.map((f) => [f.key, f.current]))
-  );
+  const [searchParams] = useSearchParams();
+  const project = projectById(searchParams.get("project")) || projectById("LA-1011");
+  const cfg = { ...SIMULATOR_CONFIG, baseRisk: project.riskScore, baseDelayDays: Math.round(project.delayPct * 0.99) };
+  const initial = initialFor(project);
+
+  const [values, setValues] = useState(initial);
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState(null);
+
+  useEffect(() => {
+    setValues(initialFor(project));
+    setResult(null);
+    setRunning(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [project.id]);
 
   const run = () => {
     setRunning(true);
     setResult(null);
     setTimeout(() => {
       const relief = SIMULATOR_CONFIG.factors.reduce((sum, f) => sum + (f.relief[values[f.key]] || 0), 0);
-      const sim = Math.max(5, SIMULATOR_CONFIG.baseRisk - relief);
+      const sim = Math.max(5, cfg.baseRisk - relief);
       setResult({
         sim,
-        delta: SIMULATOR_CONFIG.baseRisk - sim,
-        delay: Math.round(sim * 0.76),
+        delta: cfg.baseRisk - sim,
+        delay: Math.round(sim * (cfg.baseDelayDays / cfg.baseRisk)),
       });
       setRunning(false);
     }, 1300);
@@ -33,16 +58,22 @@ export default function SimulatorPage() {
       testId="simulator-page"
       crumb="What-If Simulator"
       title="What-If Simulator"
-      subtitle="Interactive prediction sandbox for project LA-1011 — adjust factors and re-run the risk model"
+      subtitle={`Interactive prediction sandbox for project ${project.id} — adjust factors and re-run the risk model`}
     >
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <Card title="Scenario Inputs" sub="Change acquisition parameters" testId="simulator-inputs">
+          <div className="mb-5 flex items-center gap-2.5 rounded-xl border border-[#0B3D91]/15 bg-[#0B3D91]/5 px-4 py-3" data-testid="simulator-project-chip">
+            <Crosshair className="h-4 w-4 shrink-0 text-[#0B3D91]" />
+            <p className="truncate text-sm font-bold text-slate-800">
+              {project.id} · <span className="font-semibold text-slate-500">{project.name}</span>
+            </p>
+          </div>
           <div className="space-y-5">
             {SIMULATOR_CONFIG.factors.map((f) => (
               <div key={f.key}>
                 <div className="mb-1.5 flex items-center justify-between">
                   <label className="text-sm font-bold text-slate-700">{f.label}</label>
-                  <span className="text-xs font-semibold text-slate-400">Current is {f.current}</span>
+                  <span className="text-xs font-semibold text-slate-400">Current is {initial[f.key]}</span>
                 </div>
                 <select
                   data-testid={`sim-input-${f.key}`}
@@ -69,7 +100,7 @@ export default function SimulatorPage() {
           </div>
         </Card>
 
-        <Card title="Prediction Result" sub="Simulated impact of your scenario" testId="simulator-result">
+        <Card title="Prediction Result" sub={`Simulated impact of your scenario on ${project.name}`} testId="simulator-result">
           <AnimatePresence mode="wait">
             {running ? (
               <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex h-72 flex-col items-center justify-center gap-3" data-testid="simulator-loading">
@@ -80,8 +111,8 @@ export default function SimulatorPage() {
               <motion.div key="result" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} data-testid="simulator-output">
                 <div className="flex items-center justify-center gap-8">
                   <div className="text-center">
-                    <p className="font-display text-5xl font-extrabold" style={{ color: scaleColor(SIMULATOR_CONFIG.baseRisk) }}>
-                      {SIMULATOR_CONFIG.baseRisk}
+                    <p className="font-display text-5xl font-extrabold" style={{ color: scaleColor(cfg.baseRisk) }}>
+                      {cfg.baseRisk}
                     </p>
                     <span className="mt-1 inline-block rounded-md border border-red-200 bg-red-50 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-red-700">
                       Current Risk
@@ -106,7 +137,7 @@ export default function SimulatorPage() {
                 </div>
 
                 <div className="relative mx-auto mt-8 h-3 max-w-sm rounded-full bg-gradient-to-r from-emerald-400 via-amber-400 to-red-500">
-                  <div className="absolute -top-1 h-5 w-1.5 rounded-full bg-slate-800" style={{ left: `calc(${SIMULATOR_CONFIG.baseRisk}% - 3px)` }} title="Current" />
+                  <div className="absolute -top-1 h-5 w-1.5 rounded-full bg-slate-800" style={{ left: `calc(${cfg.baseRisk}% - 3px)` }} title="Current" />
                   <motion.div
                     className="absolute -top-2.5 h-8 w-1.5 rounded-full bg-white ring-2 ring-slate-900"
                     initial={false}
@@ -135,7 +166,7 @@ export default function SimulatorPage() {
                 </div>
 
                 <p className="mt-5 rounded-xl border border-[#0B3D91]/15 bg-[#0B3D91]/5 p-4 text-sm leading-relaxed text-slate-600" data-testid="simulator-explanation">
-                  Resolving the selected factors could reduce delay risk by{" "}
+                  Resolving the selected factors could reduce delay risk for {project.id} by{" "}
                   <strong className="text-slate-900">{result.delta} points</strong>, moving the project toward a
                   healthier acquisition trajectory.
                 </p>
@@ -143,7 +174,7 @@ export default function SimulatorPage() {
             ) : (
               <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex h-72 items-center justify-center" data-testid="simulator-idle">
                 <p className="max-w-xs text-center text-sm font-medium text-slate-400">
-                  Adjust the scenario parameters on the left, then press <strong>Run Prediction</strong> to simulate the impact on LA-1011.
+                  Adjust the scenario parameters on the left, then press <strong>Run Prediction</strong> to simulate the impact on {project.id}.
                 </p>
               </motion.div>
             )}

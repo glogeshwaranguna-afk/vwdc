@@ -21,7 +21,7 @@ Build a landing page matching the reference (builderfest-showcase-2 preview /log
 - /gis — react-leaflet India map, risk-scaled colored markers + popups, legend, highest-risk sites list
 - /analytics — district bars, delay-factor radar, monthly area, planned-vs-actual completion
 - /recommendations — P1–P4 cards, Accept/Assign/Mark Complete/Escalate with state + toasts
-- /simulator — 5 factor dropdowns → Run Prediction → current vs simulated risk, scale bar, delta pts + est delay
+- /simulator — per-project via ?project=<id> (Run What-If passes the viewed project); 5 factor dropdowns pre-loaded from the project's real status → Run Prediction → current vs simulated risk, scale bar, delta pts + est delay
 - /blockchain — network status cards + LA-517 audit trail with hashes
 - /documents — drag&drop upload → real browser SHA-256 → verified result card
 - /compensation — LA-1011 metrics, paid/pending donut, payout progress
