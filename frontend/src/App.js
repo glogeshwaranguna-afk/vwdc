@@ -7,6 +7,18 @@ import "@/App.css";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import DashboardPage from "@/pages/DashboardPage";
+import AssistantPage from "@/pages/AssistantPage";
+import AlertsPage from "@/pages/AlertsPage";
+import ProjectRegisterPage from "@/pages/ProjectRegisterPage";
+import ProjectDetailPage from "@/pages/ProjectDetailPage";
+import GisMapPage from "@/pages/GisMapPage";
+import RiskAnalyticsPage from "@/pages/RiskAnalyticsPage";
+import RecommendationsPage from "@/pages/RecommendationsPage";
+import SimulatorPage from "@/pages/SimulatorPage";
+import BlockchainPage from "@/pages/BlockchainPage";
+import DocumentIntegrityPage from "@/pages/DocumentIntegrityPage";
+import CompensationPage from "@/pages/CompensationPage";
+import ApprovalTrackingPage from "@/pages/ApprovalTrackingPage";
 import { getSession } from "@/lib/auth";
 
 function RequireAuth({ children }) {
@@ -48,6 +60,27 @@ function AnimatedRoutes() {
             </RequireAuth>
           }
         />
+        <Route
+          path="/assistant"
+          element={
+            <RequireAuth>
+              <PageShell>
+                <AssistantPage />
+              </PageShell>
+            </RequireAuth>
+          }
+        />
+        <Route path="/alerts" element={<RequireAuth><PageShell><AlertsPage /></PageShell></RequireAuth>} />
+        <Route path="/projects" element={<RequireAuth><PageShell><ProjectRegisterPage /></PageShell></RequireAuth>} />
+        <Route path="/projects/:id" element={<RequireAuth><PageShell><ProjectDetailPage /></PageShell></RequireAuth>} />
+        <Route path="/gis" element={<RequireAuth><PageShell><GisMapPage /></PageShell></RequireAuth>} />
+        <Route path="/analytics" element={<RequireAuth><PageShell><RiskAnalyticsPage /></PageShell></RequireAuth>} />
+        <Route path="/recommendations" element={<RequireAuth><PageShell><RecommendationsPage /></PageShell></RequireAuth>} />
+        <Route path="/simulator" element={<RequireAuth><PageShell><SimulatorPage /></PageShell></RequireAuth>} />
+        <Route path="/blockchain" element={<RequireAuth><PageShell><BlockchainPage /></PageShell></RequireAuth>} />
+        <Route path="/documents" element={<RequireAuth><PageShell><DocumentIntegrityPage /></PageShell></RequireAuth>} />
+        <Route path="/compensation" element={<RequireAuth><PageShell><CompensationPage /></PageShell></RequireAuth>} />
+        <Route path="/approvals" element={<RequireAuth><PageShell><ApprovalTrackingPage /></PageShell></RequireAuth>} />
         <Route path="*" element={<RootRedirect />} />
       </Routes>
     </AnimatePresence>

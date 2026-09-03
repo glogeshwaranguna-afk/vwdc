@@ -20,28 +20,28 @@ const SECTIONS = [
   {
     title: "Overview",
     items: [
-      { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, active: true },
-      { id: "register", label: "Project Register", icon: FolderOpen },
-      { id: "gis", label: "GIS Risk Map", icon: Map },
+      { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, to: "/dashboard" },
+      { id: "register", label: "Project Register", icon: FolderOpen, to: "/projects" },
+      { id: "gis", label: "GIS Risk Map", icon: Map, to: "/gis" },
     ],
   },
   {
     title: "Intelligence",
     items: [
-      { id: "analytics", label: "Risk Analytics", icon: ShieldAlert },
-      { id: "recommendations", label: "AI Recommendations", icon: Sparkles },
-      { id: "simulator", label: "What-If Simulator", icon: SlidersHorizontal },
-      { id: "assistant", label: "AI Assistant", icon: Bot, badge: "Claude" },
+      { id: "analytics", label: "Risk Analytics", icon: ShieldAlert, to: "/analytics" },
+      { id: "recommendations", label: "AI Recommendations", icon: Sparkles, to: "/recommendations" },
+      { id: "simulator", label: "What-If Simulator", icon: SlidersHorizontal, to: "/simulator" },
+      { id: "assistant", label: "AI Assistant", icon: Bot, badge: "Claude", to: "/assistant" },
     ],
   },
   {
     title: "Governance",
     items: [
-      { id: "blockchain", label: "Blockchain Verify", icon: Link2 },
-      { id: "documents", label: "Document Integrity", icon: FileCheck },
-      { id: "compensation", label: "Compensation", icon: Wallet },
-      { id: "approvals", label: "Approval Tracking", icon: ClipboardCheck },
-      { id: "alerts", label: "Alerts & Notifications", icon: Bell },
+      { id: "blockchain", label: "Blockchain Verify", icon: Link2, to: "/blockchain" },
+      { id: "documents", label: "Document Integrity", icon: FileCheck, to: "/documents" },
+      { id: "compensation", label: "Compensation", icon: Wallet, to: "/compensation" },
+      { id: "approvals", label: "Approval Tracking", icon: ClipboardCheck, to: "/approvals" },
+      { id: "alerts", label: "Alerts & Notifications", icon: Bell, to: "/alerts" },
     ],
   },
 ];
@@ -74,18 +74,9 @@ export function Sidebar() {
               {section.title}
             </p>
             <ul className="space-y-1">
-              {section.items.map((item) => (
-                <li key={item.id}>
-                  <NavLink
-                    to={item.active ? "/dashboard" : "#"}
-                    onClick={(e) => !item.active && e.preventDefault()}
-                    data-testid={`sidebar-nav-${item.id}`}
-                    className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-200 ${
-                      item.active
-                        ? "bg-white/15 text-white shadow-inner"
-                        : "text-blue-100/70 hover:bg-white/10 hover:text-white"
-                    }`}
-                  >
+              {section.items.map((item) => {
+                const inner = (
+                  <>
                     <item.icon className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover:scale-110" />
                     <span className="flex-1">{item.label}</span>
                     {item.badge && (
@@ -93,9 +84,35 @@ export function Sidebar() {
                         {item.badge}
                       </span>
                     )}
-                  </NavLink>
-                </li>
-              ))}
+                  </>
+                );
+                return (
+                  <li key={item.id}>
+                    {item.to ? (
+                      <NavLink
+                        to={item.to}
+                        data-testid={`sidebar-nav-${item.id}`}
+                        className={({ isActive }) =>
+                          `group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-200 ${
+                            isActive
+                              ? "bg-white/15 text-white shadow-inner"
+                              : "text-blue-100/70 hover:bg-white/10 hover:text-white"
+                          }`
+                        }
+                      >
+                        {inner}
+                      </NavLink>
+                    ) : (
+                      <span
+                        data-testid={`sidebar-nav-${item.id}`}
+                        className="group flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-blue-100/70 transition-all duration-200 hover:bg-white/10 hover:text-white"
+                      >
+                        {inner}
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ))}

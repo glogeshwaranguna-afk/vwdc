@@ -1,18 +1,19 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Zap, ChevronRight } from "lucide-react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { StatCards } from "@/components/dashboard/StatCards";
 import { MonthlyDelayChart, RiskDonut, DistrictBars, DelayFactors } from "@/components/dashboard/Charts";
-import { HERO_IMAGE } from "@/lib/dashboardData";
+import { ChatPanel } from "@/components/assistant/ChatPanel";
+import { ImmediateAction } from "@/components/dashboard/ImmediateAction";
+import { PageBackdrop } from "@/components/PageBackdrop";
 
 export default function DashboardPage() {
+  const [chatOpen, setChatOpen] = useState(false);
   return (
     <div className="min-h-screen bg-slate-50" data-testid="dashboard-root">
-      <div className="pointer-events-none fixed inset-0 z-0">
-        <img src={HERO_IMAGE} alt="" className="h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/75 to-white/90" />
-      </div>
+      <PageBackdrop className="fixed z-0" />
 
       <Sidebar />
 
@@ -41,6 +42,7 @@ export default function DashboardPage() {
             </div>
             <motion.button
               data-testid="ask-ai-assistant-btn"
+              onClick={() => setChatOpen(true)}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               className="flex items-center gap-2 rounded-xl bg-[#0B3D91] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-[#0B3D91]/25 transition-colors hover:bg-[#09337A]"
@@ -65,8 +67,12 @@ export default function DashboardPage() {
             </div>
             <DelayFactors />
           </div>
+
+          <ImmediateAction />
         </main>
       </div>
+
+      <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} />
     </div>
   );
 }

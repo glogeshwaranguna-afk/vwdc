@@ -1,11 +1,13 @@
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Search, BadgeCheck, Bell, Settings, ChevronDown, LogOut, Landmark } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search, BadgeCheck, Bell, Settings, ChevronDown, LogOut, Landmark, User, SlidersHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import { getSession, signOut, initialsOf } from "@/lib/auth";
 
 export function Topbar() {
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
   const session = getSession() || { name: "A. Sharma", role: "Admin" };
 
   const onLogout = () => {
@@ -50,10 +52,11 @@ export function Topbar() {
 
         <button
           data-testid="notifications-btn"
+          onClick={() => navigate("/alerts")}
           className="relative rounded-xl p-2.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
           aria-label="Notifications"
         >
-          <Bell className="h-4.5 w-4.5 h-[18px] w-[18px]" />
+          <Bell className="h-[18px] w-[18px]" />
           <span className="absolute right-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
             4
           </span>
@@ -61,31 +64,66 @@ export function Topbar() {
 
         <button
           data-testid="settings-btn"
+          onClick={() => toast.info("Preferences open from the profile menu — demo mode")}
           className="rounded-xl p-2.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
           aria-label="Settings"
         >
-          <Settings className="h-4.5 w-4.5 h-[18px] w-[18px]" />
+          <Settings className="h-[18px] w-[18px]" />
         </button>
 
-        <button
-          data-testid="logout-btn"
-          onClick={onLogout}
-          className="rounded-xl p-2.5 text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600"
-          aria-label="Sign out"
-          title="Sign out"
-        >
-          <LogOut className="h-4.5 w-4.5 h-[18px] w-[18px]" />
-        </button>
+        <div className="relative hidden border-l border-slate-200 pl-3 sm:block" data-testid="user-profile">
+          <button
+            data-testid="user-menu-btn"
+            onClick={() => setMenuOpen((o) => !o)}
+            className="flex items-center gap-2.5 rounded-xl px-1.5 py-1 transition-colors hover:bg-slate-100"
+          >
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0B3D91] text-xs font-bold text-white">
+              {initialsOf(session.name)}
+            </div>
+            <div className="hidden text-left xl:block">
+              <p className="text-sm font-bold leading-tight text-slate-900">{session.name}</p>
+              <p className="text-xs leading-tight text-slate-500">{session.role}</p>
+            </div>
+            <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${menuOpen ? "rotate-180" : ""}`} />
+          </button>
 
-        <div className="hidden items-center gap-2.5 border-l border-slate-200 pl-3 sm:flex" data-testid="user-profile">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0B3D91] text-xs font-bold text-white">
-            {initialsOf(session.name)}
-          </div>
-          <div className="hidden xl:block">
-            <p className="text-sm font-bold leading-tight text-slate-900">{session.name}</p>
-            <p className="text-xs leading-tight text-slate-500">{session.role}</p>
-          </div>
-          <ChevronDown className="h-4 w-4 text-slate-400" />
+          <AnimatePresence>
+            {menuOpen && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
+                <motion.div
+                  initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                  transition={{ duration: 0.18 }}
+                  className="absolute right-0 z-50 mt-2 w-52 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl"
+                  data-testid="user-menu-dropdown"
+                >
+                  <button
+                    data-testid="menu-my-profile"
+                    onClick={() => { setMenuOpen(false); toast.info(`Signed in as ${session.email || session.name} — demo mode`); }}
+                    className="flex w-full items-center gap-2.5 px-4 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+                  >
+                    <User className="h-4 w-4 text-slate-400" /> My Profile
+                  </button>
+                  <button
+                    data-testid="menu-preferences"
+                    onClick={() => { setMenuOpen(false); toast.info("Preferences — demo mode"); }}
+                    className="flex w-full items-center gap-2.5 px-4 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+                  >
+                    <SlidersHorizontal className="h-4 w-4 text-slate-400" /> Preferences
+                  </button>
+                  <button
+                    data-testid="logout-btn"
+                    onClick={() => { setMenuOpen(false); onLogout(); }}
+                    className="flex w-full items-center gap-2.5 border-t border-slate-100 px-4 py-3 text-sm font-semibold text-red-600 transition-colors hover:bg-red-50"
+                  >
+                    <LogOut className="h-4 w-4" /> Sign out
+                  </button>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </motion.header>

@@ -1,5 +1,6 @@
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Landmark, TrendingUp, Map, Sparkles, ShieldCheck } from "lucide-react";
+import { PageBackdrop } from "@/components/PageBackdrop";
 
 const EASE = [0.22, 1, 0.36, 1];
 
@@ -167,12 +168,13 @@ export function AuthLayout({ children }) {
         </div>
       </motion.div>
 
-      <div className="flex min-h-screen flex-1 items-center justify-center px-6 py-12">
+      <div className="relative flex min-h-screen flex-1 items-center justify-center overflow-hidden px-6 py-12">
+        <PageBackdrop className="absolute" strong />
         <motion.div
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.35, ease: EASE }}
-          className="w-full max-w-sm"
+          className="relative z-10 w-full max-w-sm"
         >
           <div className="mb-10 flex items-center gap-3 lg:hidden">
             <div className="rounded-xl bg-[#0B3D91] p-2.5">

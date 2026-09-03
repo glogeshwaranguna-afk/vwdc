@@ -31,14 +31,14 @@ export const RISK_DISTRIBUTION = [
 ];
 
 export const DISTRICT_TRENDS = [
-  { district: "Pune", risk: 58, color: "#F59E0B" },
-  { district: "Nashik", risk: 34, color: "#10B981" },
-  { district: "Nagpur", risk: 72, color: "#EF4444" },
-  { district: "Thane", risk: 35, color: "#10B981" },
-  { district: "Sambhajinagar", risk: 90, color: "#EF4444" },
-  { district: "Solapur", risk: 33, color: "#10B981" },
-  { district: "Kolhapur", risk: 65, color: "#F97316" },
-  { district: "Satara", risk: 55, color: "#F59E0B" },
+  { district: "Pune", risk: 53, color: "#F59E0B" },
+  { district: "Nagpur", risk: 66, color: "#F97316" },
+  { district: "Jaipur", risk: 58, color: "#F97316" },
+  { district: "Lucknow", risk: 49, color: "#F59E0B" },
+  { district: "Bhopal", risk: 71, color: "#EF4444" },
+  { district: "Patna", risk: 44, color: "#F59E0B" },
+  { district: "Ahmedabad", risk: 62, color: "#F97316" },
+  { district: "Bengaluru", risk: 38, color: "#10B981" },
 ];
 
 export const DELAY_FACTORS = [
@@ -46,6 +46,7 @@ export const DELAY_FACTORS = [
   { id: "approval", label: "Pending Approval", count: 9, pct: 75 },
   { id: "legal", label: "Legal Dispute", count: 7, pct: 58 },
   { id: "docs", label: "Incomplete Docs", count: 6, pct: 50 },
+  { id: "stakeholder", label: "Stakeholder Delay", count: 4, pct: 33 },
 ];
 
 export const HERO_IMAGE =
